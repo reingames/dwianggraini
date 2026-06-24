@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai | 25th Exclusive Edition</title>
+    
+    <!-- Fonts & Icons (Wajib Koneksi Internet) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Noto+Serif+JP:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+/* --- GAYA HEADER ATAS (Biru Muda Sesuai Tema) --- */
+.top-header {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 60px;
+    background-color:#4BB8FA;
+    border-bottom: 1px solid rgba(14, 165, 233, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1500; /* Di atas isi halaman, di bawah modal menu */
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.05);
+}
+
+/* Tombol Garis Tiga (Kiri) */
+.header-menu-btn {
+    font-size: 1.3rem;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.header-menu-btn:active {
+    transform: scale(0.9);
+}
+
+/* Area Logo Ai (Kanan) */
+.header-logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-placeholder {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+}
+/* --- GAYA LOGO PNG (ESTETIK & TRANSPARAN) --- */
+.logo-img {
+    height: 36px;          /* Tinggi diatur agar pas di dalam header tinggi 60px */
+    width: auto;           /* Lebar otomatis mengikuti skala asli gambar logo Anda */
+    max-width: 120px;      /* Batas maksimal lebar agar logo tidak terlalu lebar ke samping */
+    object-fit: contain;   /* Menjaga logo PNG transparan Anda tampil utuh tanpa terpotong */
+    display: block;
+}
+
+/* --- DRAWER SISI KIRI (LACI GESER) --- */
+#menu-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 5000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+#menu-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.menu-drawer {
+    position: absolute;
+    top: 0; left: -280px; /* Masuk dari sisi kiri */
+    width: 75%; max-width: 280px;
+    height: 100%;
+    background: var(--white);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
+    padding: 40px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    transition: left 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+#menu-overlay.active .menu-drawer {
+    left: 0; /* Meluncur ke kanan */
+}
+
+.menu-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 15px;
+}
+
+.menu-drawer-header h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.close-drawer {
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #94a3b8;
+    line-height: 1;
+}
+
+.menu-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+.menu-links li a {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    transition: color 0.2s;
+}
+
+.menu-links li a i {
+    margin-right: 8px;
+    color: var(--primary);
+}
+
+/* Sub-menu lipat untuk Daftar Isi */
+.submenu-list {
+    list-style: none;
+    padding-left: 15px;
+    margin-top: 5px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    border-left: 2px solid #f1f5f9;
+}
+
+.submenu-list.open {
+    display: flex;
+}
+
+.submenu-list li a {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    padding: 4px 0 !important;
+}
+
+/* --- POP-UP MODAL CREDIT --- */
+#credit-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+#credit-modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.credit-box {
+    background: var(--white);
+    padding: 30px;
+    border-radius: 30px;
+    text-align: center;
+    max-width: 320px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.credit-box h3 {
+    font-size: 1.2rem; font-weight: 800; margin-bottom: 10px;
+    color: var(--text);
+}
+
+.credit-box p {
+    font-size: 0.85rem; color: #64748b; line-height: 1.6; margin-bottom: 25px;
+}
+        :root {
+            --primary: #0ea5e9;
+            --secondary: #e0f2fe;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text: #1e293b;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* --- Navigation Bar (iPhone Style) --- */
+        nav {
+            position: fixed;
+            bottom: 25px; left: 50%;
+            transform: translateX(-50%);
+            width: 95%; max-width: 500px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 15px 10px;
+            border-radius: 35px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        nav a {
+            color: #94a3b8;
+            font-size: 1.4rem; /* Ukuran icon diperbesar */
+            transition: 0.3s;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        nav a span {
+            font-size: 0.6rem;
+            font-weight: 700;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        nav a.active {
+            color: var(--primary);
+            transform: translateY(-8px);
+        }
+
+        /* --- Page Management --- */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 60px 20px 140px;
+            animation: slideUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Typography & Elements --- */
+        .header { margin-top: 20px; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -2px; line-height: 1.1; }
+        .header span { color: var(--primary); }
+
+        .card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.02);
+        }
+
+        .img-box {
+            width: 100%; height: 400px;
+            border-radius: 30px;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 25px;
+            background-color: #e2e8f0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .bento-card {
+            background: white; padding: 20px; border-radius: 25px; border: 1px solid #f1f5f9;
+        }
+
+        .full { grid-column: span 2; }
+
+        .btn-main {
+            background: var(--primary); color: white; padding: 18px;
+            border-radius: 20px; border: none; font-weight: 700; width: 100%;
+            font-size: 1rem; cursor: pointer; box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
+        }
+
+        /* --- Custom Section for Long Pages --- */
+        .section-title {
+            font-size: 0.8rem; font-weight: 800; color: var(--primary);
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; display: block;
+        }
+
+.sub-title-hb {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 5px; /* Memberi jarak agar terlihat eksklusif */
+    color: var(--primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+    </style>
+</head>
+<body>
+<header class="top-header">
+    <!-- Tombol Garis Tiga -->
+    <div class="header-menu-btn" onclick="toggleMenu()">
+        <i class="fa-solid fa-bars"></i>
+    </div>
+    <!-- Area Logo Ai -->
+    <div class="header-logo">
+        <!-- Ganti 'vektor/logorein.png' di bawah dengan lokasi file PNG Anda -->
+        <img src="https://files.catbox.moe/y0pk1a.png" class="logo-img" alt="Logo">
+    </div>
+</header>
+
+    <!-- MENU LACI GESER (SLIDE IN DARI KIRI) -->
+    <div id="menu-overlay" onclick="toggleMenu()">
+        <div class="menu-drawer" onclick="event.stopPropagation()">
+            <div class="menu-drawer-header">
+                <h3>Menu Eksklusif</h3>
+                <div class="close-drawer" onclick="toggleMenu()">&times;</div>
+            </div>
+            <ul class="menu-links">
+                <!-- Home (p1) -->
+                <li><a href="home.html"><span><i class="fa-solid fa-house"></i> Home</span></a></li>
+                
+                <!-- Portofolio diarahkan ke halaman Moment (p4) -->
+                <li><a href="portofolio.html"><span><i class="fa-solid fa-camera-retro"></i> Highlight</span></a></li>
+                
+                <!-- Daftar Isi dengan dropdown lipat -->
+                <li>
+                    <a href="javascript:void(0)" onclick="toggleSubmenu()">
+                        <span><i class="fa-solid fa-list-ol"></i> Daftar Isi</span>
+                        <i class="fa-solid fa-chevron-down" id="submenu-arrow" style="font-size: 0.7rem; transition: 0.3s;"></i>
+                    </a>
+                    <ul class="submenu-list" id="submenu-item">
+                        <li><a href="javascript:void(0)" onclick="selectMenu('p1')">Home (ドウィ)</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectMenu('p2')">Deep Inside (Special)</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectMenu('p3')">Our Story (Japan)</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectMenu('p4')">Snapshots (Moment)</a></li>
+                        <li><a href="javascript:void(0)" onclick="selectMenu('p5')">Small Joys (Favorites)</a></li>
+                    </ul>
+                </li>
+                
+                <!-- Login diarahkan ke halaman Secret (p6) -->
+                <li><a href="javascript:void(0)" onclick="selectMenu('p6')"><span><i class="fa-solid fa-key"></i> Login</span></a></li>
+                
+                <!-- Credit memicu Pop-Up Modal -->
+                <li><a href="javascript:void(0)" onclick="showCreditModal()"><span><i class="fa-solid fa-circle-info"></i> Credit</span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- POP-UP DIALOG BOX CREDIT -->
+    <div id="credit-modal" onclick="closeCreditModal()">
+        <div class="credit-box" onclick="event.stopPropagation()">
+            <i class="fa-solid fa-heart" style="font-size: 2.5rem; color: #fb7185; margin-bottom: 15px;"></i>
+            <h3>Created by Rein</h3>
+            <p>Situs kenangan spesial ini dirancang khusus untuk memperingati ulang tahun Dwi Anggraini yang ke-25.<br><br>Zutto issho ni iyou!</p>
+            <button class="btn-main" onclick="closeCreditModal()" style="padding: 12px; margin-top:0;">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Tab Bar Navigation dengan Icon & Teks -->
+    <nav>
+        <a href="javascript:void(0)" onclick="showPage('p1')" id="nav-p1" class="active"><i class="fa-solid fa-house"></i><span>Home</span></a>
+        <a href="javascript:void(0)" onclick="showPage('p2')" id="nav-p2"><i class="fa-solid fa-heart"></i><span>Heart</span></a>
+        <a href="javascript:void(0)" onclick="showPage('p3')" id="nav-p3"><i class="fa-solid fa-map-location-dot"></i><span>Japan</span></a>
+        <a href="javascript:void(0)" onclick="showPage('p4')" id="nav-p4"><i class="fa-solid fa-camera-retro"></i><span>Moment</span></a>
+        <a href="javascript:void(0)" onclick="showPage('p5')" id="nav-p5"><i class="fa-solid fa-star"></i><span>Joy</span></a>
+        <a href="javascript:void(0)" onclick="showPage('p6')" id="nav-p6"><i class="fa-solid fa-key"></i><span>Secret</span></a>
+    </nav>
+
+    <!-- HALAMAN 1: HOME -->
+    <div id="p1" class="page active">
+        <div class="header" data-aos="fade-down">
+           <span class="sub-title-hb">HAPPY BIRTHDAY</span>
+            <h1>DWI ANGGRAINI<br><span>ドウィ　アングライニ</span></h1>
+        </div>
+        <div class="img-box" style="background-image: url('https://i.postimg.cc/B6YDLf5P/IMG-3748.jpg');"></div>
+        <div class="card" data-aos="fade-up">
+            <h3 style="margin-bottom: 10px;">お誕生日おめでとう御座います</h3>
+            <p style="color: #64748b; line-height: 1.7;">
+            なきたいだけ ないたら きがはれる</p>
+        </div>
+        <div class="card" style="background: var(--primary); color: white;">
+            <p style="font-weight: 600;">"Fisika bilang setiap aksi ada reaksinya. Jadi semoga semua hal baik yang udah dilakukan selama ini balik ke diri sendiri dengan versi terbaiknya. Selamat ulang tahun."</p>
+        </div>
+    </div>
+
+    <!-- HALAMAN 2: HEART (Long Page) -->
+    <div id="p2" class="page">
+        <div class="header">
+            <span class="section-title">Deep Inside</span>
+            <h1>Why You Are <br><span>Special.</span></h1>
+        </div>
+        
+        <div class="card">
+            <h4 style="color: var(--primary); margin-bottom: 15px;">Kualitas Dirimu</h4>
+            <div class="bento-grid">
+                <div class="bento-card">
+                    <i class="fa-solid fa-shield-heart" style="color: #fb7185; font-size: 1.5rem; margin-bottom: 10px;"></i>
+                    <p style="font-weight: 700; font-size: 0.8rem;">Ketangguhan</p>
+                </div>
+                <div class="bento-card">
+                    <i class="fa-solid fa-face-smile-beam" style="color: #fbbf24; font-size: 1.5rem; margin-bottom: 10px;"></i>
+                    <p style="font-weight: 700; font-size: 0.8rem;">Keceriaan</p>
+                </div>
+                <div class="bento-card full">
+                    <p style="font-size: 0.85rem; color: #64748b;">Kamu adalah definisi sabar yang sebenarnya, apalagi kalau lagi ngadepin aku.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4 style="margin-bottom: 15px;">Hal-hal Kecil yang Aku Suka</h4>
+            <p style="font-size: 0.9rem; margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: var(--primary);"></i> Cara kamu cerita pas lagi semangat.</p>
+            <p style="font-size: 0.9rem; margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: var(--primary);"></i> Cara kamu ngasih perhatian pas aku capek.</p>
+            <p style="font-size: 0.9rem; margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: var(--primary);"></i> Senyum kamu pas kita lagi jalan berdua.</p>
+        </div>
+
+        <div class="card" style="border-left: 5px solid var(--primary);">
+            <p style="font-style: italic; color: #64748b;">
+                "Dwi Anggraini itu lebih dari sekadar nama buat aku, itu adalah tempat aku pulang."
+            </p>
+        </div>
+    </div>
+
+    <!-- HALAMAN 3: JAPAN LIFE (Cerita Jepang) -->
+    <div id="p3" class="page">
+        <div class="header">
+            <span class="section-title">Living the Dream</span>
+            <h1>Our Story in <br><span>Japan.</span></h1>
+        </div>
+        <div class="img-box" style="background-image: url('https://i.postimg.cc/k4bsm4Ps/IMG-4632.jpg'); height: 300px;"></div>
+        <div class="card">
+            <h4 style="color: var(--primary); margin-bottom: 10px;">Berjuang Bersama</h4>
+            <p style="line-height: 1.7; font-size: 0.9rem;">
+                Bekerja di negeri sakura ini bikin kita belajar banyak hal. Makasih ya sudah kuat sejauh ini. Aku gak bisa bayangin kalau harus ngelewatin semua ini tanpa kamu di sampingku.
+            </p>
+        </div>
+        <div class="card">
+            <div class="bento-grid">
+                <div class="bento-card">🇯🇵 Nihon Life</div>
+                <div class="bento-card">❄️ Winter Memories</div>
+                <div class="bento-card full">🌸 Haru and Growing Together</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HALAMAN 4: MOMENT (Gallery) -->
+    <div id="p4" class="page">
+        <div class="header">
+            <span class="section-title">Snapshots</span>
+            <h1>Through <br><span>The Lens.</span></h1>
+        </div>
+        <div class="img-box" style="background-image: url('https://i.postimg.cc/hvXChrdk/IMG-4152.jpg'); height: 280px;"></div>
+        <div class="img-box" style="background-image: url('https://i.postimg.cc/14xKXZPT/IMG-3892.jpg'); height: 280px;"></div>
+        <div class="img-box" style="background-image: url('https://i.postimg.cc/fLJF0Dn0/IMG-4680.jpg'); height: 280px;"></div>
+        <p style="text-align: center; color: #94a3b8; font-size: 0.8rem;">Every photo has a story to tell.</p>
+    </div>
+
+    <!-- HALAMAN 5: JOY (Favorites) -->
+    <div id="p5" class="page">
+        <div class="header">
+            <span class="section-title">Good Times</span>
+            <h1>Small Joys <br><span>Together.</span></h1>
+        </div>
+        <div class="card">
+            <h4 style="margin-bottom: 20px;">Favorite Routine</h4>
+            <div class="bento-grid">
+                <div class="bento-card"><i class="fa-solid fa-mug-hot"></i> Coffee</div>
+                <div class="bento-card"><i class="fa-solid fa-train"></i> Travel</div>
+                <div class="bento-card"><i class="fa-solid fa-utensils"></i> Dinner</div>
+                <div class="bento-card"><i class="fa-solid fa-camera"></i> Photos</div>
+            </div>
+        </div>
+        <div class="card">
+            <h4>"The little things with you are the biggest things in my life."</h4>
+        </div>
+    </div>
+
+    <!-- HALAMAN 6: SECRET (Wish) -->
+    <div id="p6" class="page">
+        <div id="login-overlay">
+            <div style="text-align: center; padding-top: 50px;">
+                <i class="fa-solid fa-lock" style="font-size: 3.5rem; color: var(--primary); margin-bottom: 20px;"></i>
+                <h2>Private Message</h2>
+                <p style="color: #64748b; margin-top: 10px; font-size: 0.9rem;">Masukkan Tanggal Lahir (DDMMYYYY)</p>
+                <input type="password" id="passInput" style="width: 100%; padding: 20px; border-radius: 20px; border: 2px solid var(--secondary); margin: 30px 0; text-align: center; font-size: 1.2rem; outline: none;">
+                <button onclick="checkPass()" class="btn-main">BUKA PESAN</button>
+            </div>
+        </div>
+
+        <div id="wish-content" style="display: none;">
+            <div class="header">
+                <h1>Happy <br><span>Birthday, Ai.</span></h1>
+            </div>
+            <div class="card">
+                <p style="line-height: 2; color: #475569;">
+                    Selamat ulang tahun yang ke-25, Sayangku Dwi Anggraini. <br><br>
+                    Melihat perjalananmu sejauh ini, aku bangga banget bisa jadi orang yang ada di sampingmu. Makasih ya sudah jadi wanita yang kuat, sabar, dan penuh cinta meskipun kita lagi jauh dari keluarga dan berjuang di Jepang. <br><br>
+                    Tetaplah jadi Ai yang ceria. Semoga di usia baru ini, kamu makin bahagia, makin dilancarkan segala urusannya, dan pastinya makin sayang sama aku. Aku bakal selalu dukung kamu di sini, hari ini, besok, dan selamanya. <br><br>
+                    <b>I love you more than words can say.</b>
+                </p>
+                <h2 style="margin-top: 40px; font-family: 'Noto Serif JP', serif; color: var(--primary);">愛してる</h2>
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">Zutto issho ni iyou!</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('nav-' + pageId).classList.add('active');
+            
+            window.scrollTo(0,0);
+        }
+
+        function checkPass() {
+            const val = document.getElementById('passInput').value;
+            if(val === "26072001") {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('wish-content').style.display = 'block';
+            } else {
+                alert("Salah, Ai! Coba ingat lagi ya.");
+            }
+        }
+/* --- SCRIPT FUNGSI HAMBURGER MENU & MODAL --- */
+        function toggleMenu() {
+            const overlay = document.getElementById('menu-overlay');
+            if (overlay) {
+                if (overlay.classList.contains('active')) {
+                    overlay.classList.remove('active');
+                    setTimeout(() => { overlay.style.display = 'none'; }, 400);
+                } else {
+                    overlay.style.display = 'block';
+                    void overlay.offsetWidth; // Memicu perbaikan render browser
+                    overlay.classList.add('active');
+                }
+            }
+        }
+
+        function toggleSubmenu() {
+            const submenu = document.getElementById('submenu-item');
+            const arrow = document.getElementById('submenu-arrow');
+            if (submenu) {
+                submenu.classList.toggle('open');
+                if (submenu.classList.contains('open')) {
+                    arrow.style.transform = 'rotate(180deg)';
+                } else {
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+
+        function selectMenu(pageId) {
+            showPage(pageId);
+            toggleMenu(); // Menutup sidebar laci otomatis setelah berpindah halaman
+        }
+
+        function showCreditModal() {
+            toggleMenu(); // Tutup laci geser terlebih dahulu
+            const modal = document.getElementById('credit-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                void modal.offsetWidth;
+                modal.classList.add('active');
+            }
+        }
+
+        function closeCreditModal() {
+            const modal = document.getElementById('credit-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => { modal.style.display = 'none'; }, 400);
+            }
+        }
+    </script>
+</body>
+</html>
